@@ -66,6 +66,22 @@ Frontend applications will be developed later.
 
 ---
 
+## 2.1 🚨 ZERO-TOLERANCE RULES FOR ALL AI AGENTS
+
+> [!CAUTION]
+> **MANDATORY HUMAN APPROVAL REQUIRED FOR ALL GIT AND DATABASE OPERATIONS:**
+>
+> 1. **GIT OPERATIONS — STRICT PERMISSION REQUIRED:**
+>    - AI agents MUST NEVER execute `git add`, `git commit`, `git push`, `git pull`, `git checkout`, `git merge`, `git branch`, or `git stash` without EXPLICIT user approval in each instance.
+>    - AI agents may ONLY run read-only git inspection commands (`git status`, `git diff`, `git log`) to check work.
+>    - Always present proposed file changes to the user and ask for permission before staging, committing, or pushing anything.
+>
+> 2. **DATABASE OPERATIONS — STRICT PERMISSION REQUIRED:**
+>    - AI agents MUST NEVER run `npx prisma migrate dev`, `prisma migrate deploy`, `prisma db push`, `prisma migrate reset`, database seeds, or SQL mutations without EXPLICIT user approval in each instance.
+>    - When database changes are needed, prepare and show the `schema.prisma` edits to the user, explain the data impact, and ask for permission before running any migration or database command.
+
+---
+
 ## 3. Core Architecture Principles
 
 The project must follow:
@@ -733,23 +749,22 @@ Database models
 Prisma queries
 Service logic
 Authorization logic
-6.10 Database Safety Rules
+6.10 Database Safety & Execution Rules
 
-AI agents MUST NOT run or suggest the following without explicit approval:
+AI agents MUST NOT run ANY database commands without explicit user approval:
 
-Database reset
-Dropping tables
-Deleting large amounts of data
-Destructive migrations
-Removing important fields
+- `npx prisma migrate dev`
+- `npx prisma migrate deploy`
+- `npx prisma db push`
+- `npx prisma migrate reset`
+- Database seeds or reset scripts
+- Dropping or altering tables
+- Deleting data or removing fields
 
-Before any potentially destructive database operation, the AI agent must clearly explain:
-
-What will change.
-What data could be affected.
-Whether the operation can be reversed.
-
-Then wait for approval.
+Before running ANY database command or migration, the AI agent MUST:
+1. Show the exact schema changes to the user.
+2. Explain what will change and whether existing data could be affected.
+3. Explicitly ask for user permission before executing the command.
 
 6.11 Before Any Database Change
 
@@ -1022,7 +1037,8 @@ Pagination implementation should follow one consistent project-wide pattern.
 
 When creating or changing an API, AI agents must check:
 
-docs/apiDesign.md
+- ARCHITECTURE.md (Section 6: API Endpoint Specifications)
+- API_CONTRACTS.md
 
 If the actual API intentionally differs from the documented design, the AI agent must:
 
@@ -1350,7 +1366,8 @@ AI agents must check the roles and permissions documentation before implementing
 Relevant documentation:
 
 ```text
-docs/rolesandpermission.md
+ARCHITECTURE.md (Section 7: Role-Based Access Control)
+```
 9.2 Authentication vs Authorization
 
 Authentication and authorization must remain separate.
@@ -1543,7 +1560,7 @@ Secrets must be stored using environment variables.
 
 AI agents must check:
 
-docs/rolesandpermission.md
+ARCHITECTURE.md (Section 7: RBAC Matrix)
 Existing Prisma user models.
 Existing authentication middleware.
 Existing authorization middleware.
@@ -1973,23 +1990,29 @@ chore    → Configuration or maintenance
 docs     → Documentation changes
 refactor → Code restructuring without feature changes
 test     → Test-related changes
-11.9 AI Agents Must Not Commit Automatically
+11.9 AI Agents Must Never Run Git Modifying Commands Without Approval
 
-AI agents should NOT automatically:
+AI agents MUST NEVER execute any of the following Git commands without explicit user instruction:
 
-Commit code.
-Push code.
-Merge branches.
-Delete branches.
+- `git add` (do not stage files automatically)
+- `git commit`
+- `git push`
+- `git pull`
+- `git checkout` / `git switch`
+- `git merge`
+- `git branch` (creation or deletion)
+- `git stash`
 
-unless explicitly instructed by the user.
+AI agents may ONLY run read-only inspection commands:
+- `git status`
+- `git diff`
+- `git log`
 
-The AI agent should instead:
-
-Complete the task.
-Show the changes.
-Explain what was changed.
-Wait for approval before Git commit or push.
+The AI agent must always:
+1. Complete the code change.
+2. Show the proposed changes via `git status` or `git diff`.
+3. Explain what was changed.
+4. Ask the user for approval BEFORE running any git staging, commit, push, or pull command.
 11.10 Before Merge
 
 Before merging a feature branch:
@@ -2558,21 +2581,20 @@ Never silently ignore exposed credentials.
 
 ## 14.1 Documentation Rules
 
-Before implementing a feature, AI agents must check relevant documentation inside:
+Before implementing a feature, AI agents must check the relevant master architecture files:
 
 ```text
-/docs
+Root Architectural Documents:
+├── AGENTS.md            # AI Rules, Guardrails & Code Standards
+├── ARCHITECTURE.md      # Master Engineering Blueprint (DB Schema, API Routes, RBAC)
+└── API_CONTRACTS.md     # Endpoint Request/Response Payloads & Status Codes
 
-Important documents may include:
-
+Supplementary Documentation:
 docs/
-├── PRD.md
-├── dbDesign.md
-├── apiDesign.md
-├── rolesandpermission.md
-├── userflow.md
-├── systemarchitecture.md
-└── projectStructure.md
+├── README.md
+├── product/             # PRD, user flows, post-MVP requirements
+└── learning-notes/      # Conversational tutorials & design drafts
+```
 
 AI agents must use documentation as the source of truth unless the existing implementation has been intentionally updated.
 
@@ -2614,7 +2636,7 @@ If an API significantly changes from the documented design, the AI agent must:
 Explain the difference.
 Explain why the change is needed.
 Ask for approval if it is a major change.
-Update docs/apiDesign.md after approval.
+Update API_CONTRACTS.md and ARCHITECTURE.md after approval.
 
 Minor implementation details do not require unnecessary documentation changes.
 
@@ -2817,10 +2839,10 @@ Do not start coding blindly.
 AI agents must read:
 
 AGENTS.md
+ARCHITECTURE.md
+API_CONTRACTS.md
 
-Then read relevant documentation from:
-
-docs/
+Then read supplementary documentation from docs/ if domain context is required.
 
 The existing project architecture and documentation should be followed.
 
@@ -2984,16 +3006,17 @@ Mention known limitations or next steps.
 
 15.12 Git Rules
 
-AI agents must NOT automatically:
+AI agents must NEVER automatically:
+- Run `git add` (stage changes)
+- Run `git commit`
+- Run `git push`
+- Run `git pull`
+- Run `git merge`
+- Create or delete branches
 
-Commit changes.
-Push changes.
-Merge branches.
-Delete branches.
+Unless explicitly instructed and approved by the user for that specific action.
 
-Unless explicitly instructed.
-
-The AI agent should complete the implementation and allow the user to review changes first.
+The AI agent should complete the implementation, run read-only git inspection (`git status`), and allow the user to review and decide when to stage, commit, or push changes.
 
 Final Rule
 

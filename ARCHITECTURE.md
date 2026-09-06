@@ -51,13 +51,14 @@ Eventify is a multi-tenant Event Management SaaS and high-concurrency Ticket Boo
    - Eventify is a multi-tenant platform. All organization resources (`venues`, `events`, `sessions`, `staff`, `bookings`) MUST be explicitly scoped by `organization_id`.
    - Never allow Organization A to read, update, or delete Organization B's records.
    - Customers are global platform users who can book events hosted by any organization.
-4. **Prisma & Database Safety:**
+4. **Prisma & Database Safety (Mandatory User Approval):**
    - NEVER create database tables manually outside Prisma migrations.
-   - NEVER run destructive commands (`prisma migrate reset`, dropping tables, deleting production fields) without explicit user confirmation.
+   - NEVER execute ANY database commands (`npx prisma migrate`, `prisma db push`, `prisma migrate reset`, seed scripts, or SQL mutations) without EXPLICIT user permission.
    - Always verify foreign key relationships, indexes, and unique constraints prior to migration creation.
-5. **Git Workflow & No Auto-Commits:**
-   - AI Agents MUST NOT commit, push, merge, or delete branches automatically unless specifically asked.
-   - Work in small, incremental steps: Make code change $\rightarrow$ Review $\rightarrow$ Test server startup & API $\rightarrow$ Check `git diff` $\rightarrow$ Report changes to user.
+5. **Git Workflow & No Auto-Adds/Commits/Pushes/Pulls (Zero Tolerance):**
+   - AI Agents MUST NEVER run `git add`, `git commit`, `git push`, `git pull`, `git checkout`, `git merge`, or create/delete branches without EXPLICIT user instruction for that specific action.
+   - AI agents may only run read-only inspection commands (`git status`, `git diff`, `git log`).
+   - Work in small, incremental steps: Make code change $\rightarrow$ Review $\rightarrow$ Test $\rightarrow$ Show `git status` $\rightarrow$ Ask user before running any Git or DB command.
 
 ---
 
@@ -84,22 +85,25 @@ Eventify is a multi-tenant Event Management SaaS and high-concurrency Ticket Boo
 ```text
 Eventify/
 ├── AGENTS.md                         # Authoritative AI Agent behavior guidelines
+├── ARCHITECTURE.md                   # This Master Engineering Blueprint & Architecture
+├── API_CONTRACTS.md                  # Comprehensive request/response payload specifications
 ├── README.md                         # Repository entry point and setup guide
-├── docs/                             # Full architectural & product specifications
-│   ├── PRD.md                        # Complete Product Requirements Document
-│   ├── ProductFoundation.md          # Business model, user personas & features
-│   ├── apiDesign.md                  # Comprehensive API endpoint designs
-│   ├── apirequestresponsecycle.md    # Request & response payloads with status codes
-│   ├── dbDesign.md                   # Initial database conceptual design
-│   ├── modifieddbdesign.md           # Production-ready PostgreSQL schema details
-│   ├── finalprojectstructure.md      # Full structural breakdown
-│   ├── laststepbeforecode.md         # Incremental coding & verification rules
-│   ├── laterrequirements.md          # Post-MVP features roadmap
-│   ├── projectStructure.md           # Modular Monolith architecture design
-│   ├── rolesandpermission.md         # RBAC matrix and access control list
-│   ├── systemarchitecture.md         # Distributed architecture & scaling strategy
-│   ├── userflow.md                   # End-to-end user journeys
-│   └── PROJECT_PLAN.md               # This Master Engineering Blueprint
+├── docs/                             # Supplementary product & design documentation
+│   ├── README.md                     # Documentation guide
+│   ├── product/                      # Product & business specifications
+│   │   ├── PRD.md                    # Complete Product Requirements Document
+│   │   ├── userflow.md               # End-to-end user journeys
+│   │   └── laterrequirements.md      # Post-MVP features roadmap
+│   └── learning-notes/               # Conversational mentoring notes & early design drafts
+│       ├── dbDesign.md               # Database conceptual notes
+│       ├── modifieddbdesign.md       # Early schema draft
+│       ├── apiDesign.md              # API design tutorial notes
+│       ├── systemarchitecture.md     # Architecture discussions
+│       ├── projectStructure.md       # Modular structure notes
+│       ├── finalprojectstructure.md  # Project structure notes
+│       ├── ProductFoundation.md      # Early idea draft
+│       ├── rolesandpermission.md     # Initial role notes
+│       └── laststepbeforecode.md     # Workflow notes
 ├── api/                              # Backend Application Root
 │   ├── prisma/
 │   │   ├── schema.prisma             # PostgreSQL schema definition
