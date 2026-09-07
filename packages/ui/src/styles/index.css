@@ -1,0 +1,71 @@
+@import './theme.css';
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* 1. Global Typography Enforcement */
+* {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Numbers, currency amounts, codes, and serial numbers */
+.font-mono,
+.ticket-code,
+.price-display,
+.stat-number {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* 2. Font Weight Normalization */
+.font-black { font-weight: 700 !important; }
+.font-bold  { font-weight: 600 !important; }
+.font-semibold { font-weight: 500 !important; }
+
+/* 3. Placeholder Standardization */
+input::placeholder,
+textarea::placeholder {
+  color: var(--erp-input-placeholder-color) !important;
+  opacity: var(--erp-input-placeholder-opacity) !important;
+  font-size: 12px;
+}
+
+/* 4. Master Table Class Defaults */
+.master-table,
+.event-table,
+.registry-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.master-table thead th,
+.event-table thead th,
+.registry-table thead th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.master-table tbody td,
+.event-table tbody td,
+.registry-table tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.master-table tbody tr:hover td,
+.event-table tbody tr:hover td,
+.registry-table tbody tr:hover td {
+  background-color: #f8fafc;
+}

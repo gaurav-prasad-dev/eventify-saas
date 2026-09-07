@@ -1,0 +1,64 @@
+/* Master Design Tokens & Palette Redirection */
+:root {
+  /* Brand Master Palette (Authoritative Indigo/Violet) */
+  --brand-50:  #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c7d2fe;
+  --brand-300: #a5b4fc;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5; /* Primary Brand Accent */
+  --brand-700: #4338ca;
+  --brand-800: #3730a3;
+  --brand-900: #312e81;
+
+  /* Surface & Background Neutrals */
+  --surface-bg: #f8fafc;
+  --surface-card: #ffffff;
+  --surface-border: #e2e8f0;
+  --surface-border-strong: #cbd5e1;
+
+  /* Form & Input Variables */
+  --erp-input-height: 36px;
+  --erp-input-border: #cbd5e1;
+  --erp-input-focus-border: var(--brand-600);
+  --erp-input-focus-ring: rgba(79, 70, 229, 0.15);
+  --erp-input-placeholder-color: #94a3b8;
+  --erp-input-placeholder-opacity: 1;
+
+  /* Status Colors */
+  --status-active-bg: #ecfdf5;
+  --status-active-text: #047857;
+  --status-active-border: #a7f3d0;
+
+  --status-pending-bg: #fffbeb;
+  --status-pending-text: #b45309;
+  --status-pending-border: #fde68a;
+
+  --status-danger-bg: #fef2f2;
+  --status-danger-text: #b91c1c;
+  --status-danger-border: #fecaca;
+}
+
+/* 
+  Palette Redirection Guardrail:
+  Redirect common Tailwind color classes to the centralized brand variables.
+  If an AI agent or developer accidentally writes bg-purple-600 or text-indigo-600,
+  it automatically resolves to --brand-600.
+*/
+@theme inline {
+  --color-purple-500: var(--brand-500);
+  --color-purple-600: var(--brand-600);
+  --color-purple-700: var(--brand-700);
+
+  --color-violet-500: var(--brand-500);
+  --color-violet-600: var(--brand-600);
+  --color-violet-700: var(--brand-700);
+
+  --color-indigo-500: var(--brand-500);
+  --color-indigo-600: var(--brand-600);
+  --color-indigo-700: var(--brand-700);
+
+  --color-blue-600:   var(--brand-600);
+  --color-blue-700:   var(--brand-700);
+}

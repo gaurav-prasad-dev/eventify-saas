@@ -1,0 +1,19 @@
+{
+  "name": "eventify-saas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Eventify Multi-tenant Event Management SaaS and Ticket Booking Platform",
+  "workspaces": [
+    "packages/*",
+    "marketplace-web",
+    "organizer-dashboard",
+    "admin-dashboard",
+    "api"
+  ],
+  "scripts": {
+    "dev:market": "npm run dev --workspace=marketplace-web",
+    "dev:organizer": "npm run dev --workspace=organizer-dashboard",
+    "dev:admin": "npm run dev --workspace=admin-dashboard",
+    "dev:api": "npm run dev --workspace=api"
+  }
+}

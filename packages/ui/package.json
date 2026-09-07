@@ -1,0 +1,24 @@
+{
+  "name": "@eventify/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Design System and Reusable UI Components for Eventify SaaS",
+  "main": "index.js",
+  "module": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./styles": "./src/styles/index.css",
+    "./theme": "./src/styles/theme.css",
+    "./tailwind.preset": "./tailwind.preset.js"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "tailwind-merge": "^3.5.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  }
+}
