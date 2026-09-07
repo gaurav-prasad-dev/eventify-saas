@@ -1,0 +1,41 @@
+const STATUSES = Object.freeze({
+  USER: {
+    ACTIVE: 'ACTIVE',
+    INACTIVE: 'INACTIVE',
+    SUSPENDED: 'SUSPENDED',
+  },
+  ORGANIZATION: {
+    ACTIVE: 'ACTIVE',
+    SUSPENDED: 'SUSPENDED',
+  },
+  MEMBER: {
+    ACTIVE: 'ACTIVE',
+    INACTIVE: 'INACTIVE',
+  },
+  INVITATION: {
+    ACTIVE: 'ACTIVE',
+    EXPIRED: 'EXPIRED',
+    DISABLED: 'DISABLED',
+  },
+  EVENT: {
+    DRAFT: 'DRAFT',
+    PUBLISHED: 'PUBLISHED',
+    UNPUBLISHED: 'UNPUBLISHED',
+    ARCHIVED: 'ARCHIVED',
+  },
+  BOOKING: {
+    PENDING: 'PENDING',
+    CONFIRMED: 'CONFIRMED',
+    CANCELLED: 'CANCELLED',
+    EXPIRED: 'EXPIRED',
+  },
+  TICKET: {
+    ISSUED: 'ISSUED',
+    CHECKED_IN: 'CHECKED_IN',
+    CANCELLED: 'CANCELLED',
+  },
+});
+
+module.exports = {
+  STATUSES,
+};
