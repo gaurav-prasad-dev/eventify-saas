@@ -17,12 +17,11 @@ router.get('/health', (req, res) => {
   });
 });
 
-// Future module routes will be registered here:
-// router.use('/auth', authRoutes);
-// router.use('/profile', userRoutes);
-// router.use('/organizations', organizationRoutes);
-// router.use('/venues', venueRoutes);
-// router.use('/events', eventRoutes);
-// router.use('/bookings', bookingRoutes);
+// Module Routes
+const authRoutes = require('../modules/auth/auth.routes');
+const userRoutes = require('../modules/users/user.routes');
+
+router.use('/auth', authRoutes);
+router.use('/profile', userRoutes);
 
 module.exports = router;

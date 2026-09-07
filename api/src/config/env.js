@@ -14,6 +14,17 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   CORS_ORIGIN: z.string().default('http://localhost:5173,http://localhost:3000'),
+
+  // SMTP Email Configuration (Nodemailer)
+  SMTP_HOST: z.string().default('smtp.gmail.com'),
+  SMTP_PORT: z.coerce.number().default(587),
+  SMTP_USER: z.string().optional().default(''),
+  SMTP_PASS: z.string().optional().default(''),
+  SMTP_FROM: z.string().default('Eventify <noreply@eventify.com>'),
+  SMTP_SECURE: z
+    .union([z.boolean(), z.string()])
+    .transform((val) => val === true || val === 'true')
+    .default(false),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

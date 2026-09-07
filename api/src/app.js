@@ -48,7 +48,11 @@ app.get('/', (req, res) => {
   });
 });
 
-// 6. Master API Routes (/api/v1)
+// 6. Global API Rate Limiter
+const { globalLimiter } = require('./shared/middleware/rateLimiter.middleware');
+app.use('/api', globalLimiter);
+
+// 7. Master API Routes (/api/v1)
 app.use('/api/v1', routes);
 
 // 7. 404 Not Found Middleware
