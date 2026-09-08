@@ -20,8 +20,12 @@ router.get('/health', (req, res) => {
 // Module Routes
 const authRoutes = require('../modules/auth/auth.routes');
 const userRoutes = require('../modules/users/user.routes');
+const venueRoutes = require('../modules/venues/venue.routes');
+const eventRoutes = require('../modules/events/event.routes');
 
 router.use('/auth', authRoutes);
 router.use('/profile', userRoutes);
+router.use('/venues', venueRoutes);
+router.use('/events', eventRoutes);
 
 module.exports = router;

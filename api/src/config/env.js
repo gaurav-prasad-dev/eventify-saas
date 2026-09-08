@@ -25,6 +25,11 @@ const envSchema = z.object({
     .union([z.boolean(), z.string()])
     .transform((val) => val === true || val === 'true')
     .default(false),
+
+  // Cloudinary Image Storage
+  CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
+  CLOUDINARY_API_KEY: z.string().optional().default(''),
+  CLOUDINARY_API_SECRET: z.string().optional().default(''),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
