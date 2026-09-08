@@ -8,7 +8,7 @@ import {
   FormField,
   FormInput,
 } from '@eventify/ui';
-import { Building2, DollarSign, TrendingUp, ShieldAlert, Plus, Download } from 'lucide-react';
+import { Building2, DollarSign, TrendingUp, Plus, Download } from 'lucide-react';
 
 const initialOrgs = [
   {
@@ -88,7 +88,7 @@ export const OrganizationsPage = () => {
       </div>
 
       {/* 3. Filter Bar */}
-      <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
+      <div className="flex items-center gap-3 bg-white dark:bg-zinc-900 p-3 rounded-2xl border border-slate-200 dark:border-zinc-800 card-side-shadow">
         <div className="w-72">
           <FormField>
             <FormInput
@@ -104,7 +104,7 @@ export const OrganizationsPage = () => {
       <TableShell
         footer={
           <span>
-            Total: <strong className="font-semibold text-slate-700">{orgs.length}</strong> tenant organizations
+            Total: <strong className="font-semibold text-slate-700 dark:text-zinc-200">{orgs.length}</strong> tenant organizations
           </span>
         }
       >
@@ -124,14 +124,14 @@ export const OrganizationsPage = () => {
           <tbody>
             {filteredOrgs.map((org) => (
               <tr key={org.id}>
-                <td className="font-mono text-xs text-slate-400">{org.id}</td>
-                <td className="font-semibold text-slate-800">{org.name}</td>
-                <td className="text-slate-600">{org.ownerEmail}</td>
-                <td className="font-mono text-xs font-semibold text-brand-600">
+                <td className="font-mono text-xs text-slate-400 dark:text-zinc-500">{org.id}</td>
+                <td className="font-semibold text-slate-900 dark:text-white">{org.name}</td>
+                <td className="text-slate-600 dark:text-zinc-300">{org.ownerEmail}</td>
+                <td className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   {org.plan}
                 </td>
                 <td className="font-mono text-xs">{org.eventsHosted}</td>
-                <td className="font-mono font-semibold text-slate-900 price-display">
+                <td className="font-mono font-bold text-slate-900 dark:text-white price-display">
                   {org.platformFeeEarned}
                 </td>
                 <td>

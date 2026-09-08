@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import {
-  PageHeader,
   ActionButton,
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
   Badge,
   FormField,
   FormInput,
 } from '@eventify/ui';
-import { Calendar, MapPin, Ticket, Search, Sparkles } from 'lucide-react';
+import { Calendar, MapPin, Ticket, Sparkles } from 'lucide-react';
+import { useAuth } from '../../auth/context/AuthContext';
 
 const featuredEvents = [
   {
@@ -48,8 +44,9 @@ const featuredEvents = [
   },
 ];
 
-export const MarketplaceEventsPage = () => {
+export const MarketplaceEventsPage = ({ onBookTickets }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { isAuthenticated } = useAuth();
 
   const filteredEvents = featuredEvents.filter(
     (e) =>
@@ -57,22 +54,33 @@ export const MarketplaceEventsPage = () => {
       e.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleBooking = (evt) => {
+    if (!isAuthenticated && onBookTickets) {
+      onBookTickets();
+    } else {
+      alert(`Booking initiated for ${evt.title}`);
+    }
+  };
+
   return (
     <div className="space-y-8">
-      {/* Hero Banner using Brand Tokens */}
-      <div className="bg-gradient-to-r from-brand-900 via-brand-700 to-brand-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
-        <div className="max-w-2xl space-y-3 relative z-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-sm border border-white/20">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+      {/* Hero Banner: Emerald Green & Obsidian Black */}
+      <div className="bg-gradient-to-r from-zinc-950 via-zinc-900 to-emerald-950 border border-emerald-500/30 rounded-2xl p-8 sm:p-12 text-white card-side-shadow relative overflow-hidden">
+        <div className="max-w-2xl space-y-4 relative z-10">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 backdrop-blur-sm">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
             Live Experience Booking Platform
           </span>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Discover & Book Live Experiences
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            Discover & Book Unforgettable Experiences
           </h1>
-          <p className="text-xs text-brand-100 max-w-lg">
-            Find the most exciting tech conferences, music concerts, and business workshops in your city. Instant QR ticket delivery.
+          <p className="text-xs sm:text-sm text-zinc-300 max-w-lg leading-relaxed">
+            Find the most exciting tech conferences, music concerts, and workshops in your city. Direct organizer verification & instant QR tickets.
           </p>
         </div>
+
+        {/* Ambient Emerald Accent Glow */}
+        <div className="absolute right-0 top-0 -mr-16 -mt-16 w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Filter & Search Bar */}
@@ -86,59 +94,69 @@ export const MarketplaceEventsPage = () => {
             />
           </FormField>
         </div>
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2 self-start sm:self-auto overflow-x-auto pb-1">
           <Badge variant="primary">All Events ({filteredEvents.length})</Badge>
           <Badge variant="neutral">Conferences</Badge>
-          <Badge variant="neutral">Music</Badge>
+          <Badge variant="neutral">Concerts</Badge>
           <Badge variant="neutral">Workshops</Badge>
         </div>
       </div>
 
-      {/* Event Cards Grid */}
+      {/* Event Cards Grid with Geometric Side Shadow */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map((evt) => (
-          <Card key={evt.id} className="flex flex-col justify-between hover:shadow-card transition-shadow">
-            <CardContent className="space-y-3">
+          <div
+            key={evt.id}
+            className="card-side-shadow rounded-2xl flex flex-col justify-between overflow-hidden"
+          >
+            <div className="p-6 space-y-3.5">
               <div className="flex items-center justify-between">
-                <Badge variant="primary">{evt.category}</Badge>
-                <span className="font-mono text-xs text-slate-400">{evt.id}</span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                  {evt.category}
+                </span>
+                <span className="font-mono text-xs text-slate-400 dark:text-zinc-500">{evt.id}</span>
               </div>
 
-              <h3 className="text-base font-bold text-slate-900 line-clamp-1">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1">
                 {evt.title}
               </h3>
 
-              <div className="space-y-1.5 text-xs text-slate-500 pt-1">
+              <div className="space-y-2 text-xs text-slate-500 dark:text-zinc-400 pt-1">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5 text-brand-600 shrink-0" />
+                  <Calendar className="w-4 h-4 text-emerald-500 shrink-0" />
                   <span>{evt.date} • {evt.time}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <MapPin className="w-4 h-4 text-slate-400 dark:text-zinc-500 shrink-0" />
                   <span className="truncate">{evt.venue}</span>
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-between border-t border-slate-100">
-                <span className="text-xs text-slate-400">By {evt.organizer}</span>
-                <span className="text-xs font-semibold text-emerald-600">
+              <div className="pt-3 flex items-center justify-between border-t border-slate-100 dark:border-zinc-800">
+                <span className="text-xs text-slate-400 dark:text-zinc-500">By {evt.organizer}</span>
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   {evt.availableSeats} seats left
                 </span>
               </div>
-            </CardContent>
+            </div>
 
-            <CardFooter className="flex items-center justify-between">
+            <div className="px-6 py-4 bg-slate-50/70 dark:bg-zinc-900/70 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">From</span>
-                <span className="text-lg font-bold font-mono text-slate-900 price-display">
+                <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-zinc-500 block">Price</span>
+                <span className="text-lg font-bold font-mono text-slate-900 dark:text-white price-display">
                   {evt.price}
                 </span>
               </div>
-              <ActionButton variant="primary" size="md" icon={<Ticket />}>
+              <ActionButton
+                variant="primary"
+                size="md"
+                icon={<Ticket />}
+                onClick={() => handleBooking(evt)}
+              >
                 Book Tickets
               </ActionButton>
-            </CardFooter>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
     </div>

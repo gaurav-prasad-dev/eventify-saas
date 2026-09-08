@@ -187,15 +187,29 @@ class AuthService {
    */
   async loginWithGoogle(idToken) {
     try {
-      // Verify token with Google's public tokeninfo endpoint
-      const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
-      if (!response.ok) {
-        throw new Error('Google token validation failed');
-      }
+      let payload;
 
-      const payload = await response.json();
-      if (!payload.email || !payload.email_verified) {
-        throw new AppError('Google account email is not verified.', 400, ERROR_CODES.VALIDATION_ERROR);
+      // In local development, support dev test tokens without requiring Google Cloud setup
+      if (process.env.NODE_ENV === 'development' && idToken.startsWith('dev_google_')) {
+        const testEmail = idToken.replace('dev_google_', '') || 'google.user@example.com';
+        payload = {
+          email: testEmail,
+          email_verified: true,
+          name: testEmail.split('@')[0].charAt(0).toUpperCase() + testEmail.split('@')[0].slice(1),
+          sub: `google_sub_${Buffer.from(testEmail).toString('base64').substring(0, 16)}`,
+          picture: `https://api.dicebear.com/7.x/avataaars/svg?seed=${testEmail}`,
+        };
+      } else {
+        // Verify genuine token with Google's public tokeninfo endpoint
+        const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
+        if (!response.ok) {
+          throw new Error('Google token validation failed');
+        }
+
+        payload = await response.json();
+        if (!payload.email || !payload.email_verified) {
+          throw new AppError('Google account email is not verified.', 400, ERROR_CODES.VALIDATION_ERROR);
+        }
       }
 
       const normalizedEmail = payload.email.toLowerCase().trim();

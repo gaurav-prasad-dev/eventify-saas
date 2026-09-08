@@ -1,30 +1,38 @@
-/* Master Design Tokens & Palette Redirection */
+/* Master Design Tokens: Green & Black System with Dark/Light Mode */
 :root {
-  /* Brand Master Palette (Authoritative Indigo/Violet) */
-  --brand-50:  #eef2ff;
-  --brand-100: #e0e7ff;
-  --brand-200: #c7d2fe;
-  --brand-300: #a5b4fc;
-  --brand-400: #818cf8;
-  --brand-500: #6366f1;
-  --brand-600: #4f46e5; /* Primary Brand Accent */
-  --brand-700: #4338ca;
-  --brand-800: #3730a3;
-  --brand-900: #312e81;
+  /* Brand Master Palette: Vibrant Emerald Green */
+  --brand-50:  #ecfdf5;
+  --brand-100: #d1fae5;
+  --brand-200: #a7f3d0;
+  --brand-300: #6ee7b7;
+  --brand-400: #34d399;
+  --brand-500: #10b981; /* Primary Emerald */
+  --brand-600: #059669; /* Primary Hover */
+  --brand-700: #047857;
+  --brand-800: #065f46;
+  --brand-900: #064e3b;
+  --brand-950: #022c22;
 
-  /* Surface & Background Neutrals */
-  --surface-bg: #f8fafc;
-  --surface-card: #ffffff;
-  --surface-border: #e2e8f0;
-  --surface-border-strong: #cbd5e1;
+  /* Surface & Background Neutrals (Light Mode) */
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --border-color: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary: #09090b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
 
   /* Form & Input Variables */
-  --erp-input-height: 36px;
+  --erp-input-height: 38px;
   --erp-input-border: #cbd5e1;
-  --erp-input-focus-border: var(--brand-600);
-  --erp-input-focus-ring: rgba(79, 70, 229, 0.15);
+  --erp-input-focus-border: var(--brand-500);
+  --erp-input-focus-ring: rgba(16, 185, 129, 0.2);
   --erp-input-placeholder-color: #94a3b8;
   --erp-input-placeholder-opacity: 1;
+
+  /* Geometric Side Shadow (Light Mode) */
+  --shadow-side: -5px 5px 0px 0px rgba(16, 185, 129, 0.25), -10px 10px 24px -2px rgba(0, 0, 0, 0.08);
+  --shadow-side-hover: -7px 7px 0px 0px rgba(16, 185, 129, 0.4), -14px 14px 30px -2px rgba(0, 0, 0, 0.14);
 
   /* Status Colors */
   --status-active-bg: #ecfdf5;
@@ -40,11 +48,27 @@
   --status-danger-border: #fecaca;
 }
 
+/* Dark Mode Tokens (Deep Obsidian Black & Charcoal) */
+.dark {
+  --bg-primary: #09090b;   /* OLED Pure Dark */
+  --bg-card: #121215;      /* Carbon Dark Card */
+  --border-color: #27272a; /* Muted Charcoal Border */
+  --border-strong: #3f3f46;
+  --text-primary: #f8fafc; /* Pure White Text */
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --erp-input-border: #27272a;
+  --erp-input-placeholder-color: #71717a;
+
+  /* Geometric Side Shadow with Emerald Glow (Dark Mode) */
+  --shadow-side: -5px 5px 0px 0px rgba(16, 185, 129, 0.35), -12px 12px 28px -2px rgba(0, 0, 0, 0.7);
+  --shadow-side-hover: -7px 7px 0px 0px rgba(16, 185, 129, 0.55), -16px 16px 36px -2px rgba(0, 0, 0, 0.85);
+}
+
 /* 
   Palette Redirection Guardrail:
-  Redirect common Tailwind color classes to the centralized brand variables.
-  If an AI agent or developer accidentally writes bg-purple-600 or text-indigo-600,
-  it automatically resolves to --brand-600.
+  Maps common utility families (purple, violet, indigo, blue) directly to emerald brand variables.
 */
 @theme inline {
   --color-purple-500: var(--brand-500);
@@ -59,6 +83,7 @@
   --color-indigo-600: var(--brand-600);
   --color-indigo-700: var(--brand-700);
 
+  --color-blue-500:   var(--brand-500);
   --color-blue-600:   var(--brand-600);
   --color-blue-700:   var(--brand-700);
 }

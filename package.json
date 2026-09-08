@@ -11,9 +11,16 @@
     "api"
   ],
   "scripts": {
+    "dev": "concurrently -k -n \"API,MARKET,ORG,ADMIN\" -c \"cyan,green,magenta,yellow\" \"npm run dev:api\" \"npm run dev:market\" \"npm run dev:organizer\" \"npm run dev:admin\"",
+    "dev:ui": "concurrently -k -n \"MARKET,ORG,ADMIN\" -c \"green,magenta,yellow\" \"npm run dev:market\" \"npm run dev:organizer\" \"npm run dev:admin\"",
+    "dev:api": "npm run dev --workspace=api",
     "dev:market": "npm run dev --workspace=marketplace-web",
     "dev:organizer": "npm run dev --workspace=organizer-dashboard",
     "dev:admin": "npm run dev --workspace=admin-dashboard",
-    "dev:api": "npm run dev --workspace=api"
+    "prisma:generate": "prisma generate --schema=api/prisma/schema.prisma",
+    "postinstall": "npm run prisma:generate"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }

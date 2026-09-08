@@ -36,5 +36,21 @@ export { StatCard } from './src/components/card/StatCard.jsx';
 // Feedback
 export { EmptyState } from './src/components/feedback/EmptyState.jsx';
 
+// Theming & Dark Mode
+export { ThemeProvider, useTheme } from './src/components/theme/ThemeContext.jsx';
+export { ThemeToggle } from './src/components/theme/ThemeToggle.jsx';
+
+// Toast System
+export { ToastProvider, useToast } from './src/components/toast/ToastContext.jsx';
+
+// Brand & Logo
+export { Logo } from './src/components/brand/Logo.jsx';
+
+// Auth Primitives
+export { OtpInput } from './src/components/auth/OtpInput.jsx';
+export { GoogleButton } from './src/components/auth/GoogleButton.jsx';
+export { CountdownTimer } from './src/components/auth/CountdownTimer.jsx';
+export { AuthModal } from './src/components/auth/AuthModal.jsx';
+
 // Utilities
 export { cn } from './src/utils/cn.js';

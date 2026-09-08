@@ -88,7 +88,7 @@ export const EventsPage = () => {
       </div>
 
       {/* 3. Search & Filter Bar */}
-      <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
+      <div className="flex items-center gap-3 bg-white dark:bg-zinc-900 p-3 rounded-2xl border border-slate-200 dark:border-zinc-800 card-side-shadow">
         <div className="w-72">
           <FormField>
             <FormInput
@@ -104,8 +104,8 @@ export const EventsPage = () => {
       <TableShell
         footer={
           <span>
-            Showing <strong className="font-semibold text-slate-700">{filteredEvents.length}</strong> of{' '}
-            <strong className="font-semibold text-slate-700">{events.length}</strong> events
+            Showing <strong className="font-semibold text-slate-700 dark:text-zinc-200">{filteredEvents.length}</strong> of{' '}
+            <strong className="font-semibold text-slate-700 dark:text-zinc-200">{events.length}</strong> events
           </span>
         }
       >
@@ -125,12 +125,12 @@ export const EventsPage = () => {
           <tbody>
             {filteredEvents.map((evt) => (
               <tr key={evt.id}>
-                <td className="font-mono text-xs text-slate-400">{evt.id}</td>
-                <td className="font-semibold text-slate-800">{evt.title}</td>
-                <td className="text-slate-600">{evt.venue}</td>
-                <td className="font-mono text-xs text-slate-600">{evt.date}</td>
+                <td className="font-mono text-xs text-slate-400 dark:text-zinc-500">{evt.id}</td>
+                <td className="font-semibold text-slate-900 dark:text-white">{evt.title}</td>
+                <td className="text-slate-600 dark:text-zinc-300">{evt.venue}</td>
+                <td className="font-mono text-xs text-slate-500 dark:text-zinc-400">{evt.date}</td>
                 <td className="font-mono text-xs">{evt.ticketsSold}</td>
-                <td className="font-mono font-semibold text-slate-900 price-display">
+                <td className="font-mono font-bold text-slate-900 dark:text-white price-display">
                   {evt.revenue}
                 </td>
                 <td>
