@@ -22,5 +22,11 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.5"
+  },
+  "dependencies": {
+    "concat-stream": "^2.0.0",
+    "streamsearch": "^1.1.0",
+    "xmlhttprequest-ssl": "^4.0.0",
+    "xtend": "^4.0.2"
   }
 }

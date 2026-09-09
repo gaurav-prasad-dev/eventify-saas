@@ -22,11 +22,21 @@ const authRoutes = require('../modules/auth/auth.routes');
 const userRoutes = require('../modules/users/user.routes');
 const venueRoutes = require('../modules/venues/venue.routes');
 const eventRoutes = require('../modules/events/event.routes');
+const publicEventRoutes = require('../modules/public/publicEvent.routes');
+const bookingRoutes = require('../modules/bookings/booking.routes');
+const paymentRoutes = require('../modules/payments/payment.routes');
+const webhookRoutes = require('../modules/payments/webhook.routes');
+const ticketRoutes = require('../modules/tickets/ticket.routes');
 
 router.use('/auth', authRoutes);
 router.use('/profile', userRoutes);
 router.use('/venues', venueRoutes);
 router.use('/events', eventRoutes);
+router.use('/public', publicEventRoutes);
+router.use('/bookings', bookingRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/webhooks', webhookRoutes);
+router.use('/tickets', ticketRoutes);
 
 module.exports = router;
 

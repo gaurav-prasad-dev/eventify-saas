@@ -33,6 +33,17 @@ const envSchema = z.object({
 
   // Redis Configuration (Distributed Seat Locking)
   REDIS_URL: z.string().optional().default(''),
+
+  // Razorpay Payment Gateway
+  RAZORPAY_KEY_ID: z
+    .string()
+    .optional()
+    .default(process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_TEST_API || ''),
+  RAZORPAY_KEY_SECRET: z
+    .string()
+    .optional()
+    .default(process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_TEST_SECRET || ''),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional().default(''),
 });
 
 
