@@ -1,12 +1,19 @@
+const http = require('http');
 const app = require('./app');
 const env = require('./config/env');
+const { initSocket } = require('./config/socket');
 
 const PORT = env.PORT || 5000;
+const server = http.createServer(app);
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Eventify API server running on port ${PORT} [${env.NODE_ENV}]`);
+// Attach Socket.IO real-time engine
+initSocket(server);
+
+server.listen(PORT, () => {
+  console.log(`🚀 Eventify API & Socket.IO server running on port ${PORT} [${env.NODE_ENV}]`);
   console.log(`👉 Health check: http://localhost:${PORT}/api/v1/health`);
 });
+
 
 // Graceful Shutdown Handler
 const handleGracefulShutdown = (signal) => {

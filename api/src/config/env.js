@@ -30,7 +30,11 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
   CLOUDINARY_API_KEY: z.string().optional().default(''),
   CLOUDINARY_API_SECRET: z.string().optional().default(''),
+
+  // Redis Configuration (Distributed Seat Locking)
+  REDIS_URL: z.string().optional().default(''),
 });
+
 
 const parsedEnv = envSchema.safeParse(process.env);
 

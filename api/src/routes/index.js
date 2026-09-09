@@ -22,12 +22,11 @@ const authRoutes = require('../modules/auth/auth.routes');
 const userRoutes = require('../modules/users/user.routes');
 const venueRoutes = require('../modules/venues/venue.routes');
 const eventRoutes = require('../modules/events/event.routes');
-const publicEventRoutes = require('../modules/events/public.routes');
 
 router.use('/auth', authRoutes);
 router.use('/profile', userRoutes);
 router.use('/venues', venueRoutes);
 router.use('/events', eventRoutes);
-router.use('/public/events', publicEventRoutes);
 
 module.exports = router;
+

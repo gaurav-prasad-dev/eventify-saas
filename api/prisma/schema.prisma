@@ -26,6 +26,7 @@ model User {
 
   memberships        OrganizationMember[]
   invitationsCreated OrganizationInvitation[] @relation("InvitationCreator")
+  bookings           Booking[]
 
   @@map("users")
 }
@@ -62,6 +63,7 @@ model Organization {
   venues         Venue[]
   venueContracts VenueContract[]
   events         Event[]
+  bookings       Booking[]
 
   @@map("organizations")
 }
@@ -287,6 +289,7 @@ model VenueSeat {
   updatedAt  DateTime           @updatedAt @map("updated_at")
 
   layout     VenueSeatingLayout @relation(fields: [layoutId], references: [id], onDelete: Cascade)
+  bookingSeats BookingSeat[]
 
   @@unique([layoutId, seatNumber])
   @@index([layoutId])
@@ -338,6 +341,7 @@ model Event {
 
   sessions           EventSession[]
   ticketTiers        EventTicketTier[]
+  bookings           Booking[]
 
   @@unique([organizationId, slug])
   @@index([organizationId, status])
@@ -361,6 +365,8 @@ model EventSession {
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
   event        Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+  bookingSeats BookingSeat[]
 
   @@index([eventId, startTime])
   @@map("event_sessions")
@@ -390,9 +396,95 @@ model EventTicketTier {
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
   event             Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookingItems      BookingItem[]
+  bookingSeats      BookingSeat[]
 
   @@index([eventId, status])
   @@map("event_ticket_tiers")
+}
+
+// -------------------------------------------------------------
+// 16. Customer Booking Model
+// -------------------------------------------------------------
+model Booking {
+  id                 String         @id @default(uuid()) @db.Uuid
+  bookingNumber      String         @unique @map("booking_number") @db.VarChar(50)
+  userId             String         @map("user_id") @db.Uuid
+  eventId            String         @map("event_id") @db.Uuid
+  sessionId          String         @map("session_id") @db.Uuid
+  organizationId     String         @map("organization_id") @db.Uuid
+
+  totalAmount        Decimal        @map("total_amount") @db.Decimal(10, 2)
+  taxAmount          Decimal        @default(0) @map("tax_amount") @db.Decimal(10, 2)
+  finalAmount        Decimal        @map("final_amount") @db.Decimal(10, 2)
+  currency           String         @default("INR") @db.VarChar(10)
+
+  status             String         @default("PENDING") @db.VarChar(20) // PENDING, CONFIRMED, CANCELLED, EXPIRED
+  paymentStatus      String         @default("PENDING") @map("payment_status") @db.VarChar(20) // PENDING, PAID, FAILED, REFUNDED
+  expiresAt          DateTime       @map("expires_at")
+  confirmedAt        DateTime?      @map("confirmed_at")
+  cancelledAt        DateTime?      @map("cancelled_at")
+  cancellationReason String?        @map("cancellation_reason") @db.Text
+
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event              Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  session            EventSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  organization       Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items              BookingItem[]
+  seats              BookingSeat[]
+
+  @@index([userId, status])
+  @@index([eventId, sessionId])
+  @@index([organizationId, status])
+  @@map("bookings")
+}
+
+// -------------------------------------------------------------
+// 17. Booking Item Model (Tiers & Quantities)
+// -------------------------------------------------------------
+model BookingItem {
+  id           String          @id @default(uuid()) @db.Uuid
+  bookingId    String          @map("booking_id") @db.Uuid
+  ticketTierId String          @map("ticket_tier_id") @db.Uuid
+  quantity     Int             @default(1)
+  unitPrice    Decimal         @map("unit_price") @db.Decimal(10, 2)
+  subtotal     Decimal         @db.Decimal(10, 2)
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  booking      Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  ticketTier   EventTicketTier @relation(fields: [ticketTierId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_items")
+}
+
+// -------------------------------------------------------------
+// 18. Booking Seat Model (Specific Reserved Seats)
+// -------------------------------------------------------------
+model BookingSeat {
+  id           String          @id @default(uuid()) @db.Uuid
+  bookingId    String          @map("booking_id") @db.Uuid
+  sessionId    String          @map("session_id") @db.Uuid
+  venueSeatId  String          @map("venue_seat_id") @db.Uuid
+  ticketTierId String          @map("ticket_tier_id") @db.Uuid
+  seatNumber   String          @map("seat_number") @db.VarChar(20)
+  rowNumber    String?         @map("row_number") @db.VarChar(20)
+  section      String          @default("General") @db.VarChar(100)
+  status       String          @default("LOCKED") @db.VarChar(20) // LOCKED, BOOKED, RELEASED
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  booking      Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  session      EventSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  venueSeat    VenueSeat       @relation(fields: [venueSeatId], references: [id], onDelete: Cascade)
+  ticketTier   EventTicketTier @relation(fields: [ticketTierId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, venueSeatId, status])
+  @@index([bookingId])
+  @@map("booking_seats")
 }
 
 
