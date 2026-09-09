@@ -117,6 +117,16 @@ const deleteTier = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, 'Ticket tier deleted successfully', result);
 });
 
+const getPublicEvents = asyncHandler(async (req, res) => {
+  const result = await eventService.getPublicEvents(req.query);
+  sendSuccess(res, 200, 'Published events retrieved successfully', result);
+});
+
+const getPublicEventDetails = asyncHandler(async (req, res) => {
+  const event = await eventService.getPublicEventBySlugOrId(req.params.idOrSlug);
+  sendSuccess(res, 200, 'Event details retrieved successfully', { event });
+});
+
 module.exports = {
   createEvent,
   getEvents,
@@ -134,4 +144,6 @@ module.exports = {
   getTiers,
   updateTier,
   deleteTier,
+  getPublicEvents,
+  getPublicEventDetails,
 };

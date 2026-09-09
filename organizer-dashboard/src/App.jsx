@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from './features/auth/context/AuthContext';
 import { OrganizerLoginPage } from './features/auth/pages/OrganizerLoginPage';
 import { AcceptInvitePage } from './features/auth/pages/AcceptInvitePage';
 import { EventsPage } from './features/events/pages/EventsPage';
+import { VenuesPage } from './features/venues/pages/VenuesPage';
 import {
   Calendar,
   MapPin,
@@ -23,6 +24,7 @@ import {
 
 function DashboardContent() {
   const { user, activeOrganization, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState('events'); // 'events' | 'venues'
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 transition-colors">
@@ -33,20 +35,30 @@ function DashboardContent() {
         </div>
 
         <nav className="p-4 space-y-1.5 flex-1">
-          <a
-            href="#events"
-            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50"
+          <button
+            type="button"
+            onClick={() => setActiveTab('events')}
+            className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+              activeTab === 'events'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50'
+                : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white'
+            }`}
           >
-            <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <Calendar className={`w-4 h-4 ${activeTab === 'events' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-zinc-500'}`} />
             Events
-          </a>
-          <a
-            href="#venues"
-            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('venues')}
+            className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+              activeTab === 'venues'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50'
+                : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white'
+            }`}
           >
-            <MapPin className="w-4 h-4 text-slate-400 dark:text-zinc-500" />
-            Venues
-          </a>
+            <MapPin className={`w-4 h-4 ${activeTab === 'venues' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-zinc-500'}`} />
+            Venues & Deals
+          </button>
           <a
             href="#tickets"
             className="flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -119,7 +131,8 @@ function DashboardContent() {
         </header>
 
         <main className="p-8 flex-1 overflow-auto">
-          <EventsPage />
+          {activeTab === 'events' && <EventsPage />}
+          {activeTab === 'venues' && <VenuesPage />}
         </main>
       </div>
     </div>

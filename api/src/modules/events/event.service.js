@@ -585,6 +585,197 @@ class EventService {
       },
     });
   }
+
+  // =========================================================================
+  // 5. PUBLIC MARKETPLACE DISCOVERY (UNAUTHENTICATED)
+  // =========================================================================
+
+  /**
+   * Browse and filter live published events for marketplace visitors
+   */
+  async getPublicEvents(query = {}) {
+    const page = Math.max(1, parseInt(query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(query.limit, 10) || 20));
+    const skip = (page - 1) * limit;
+
+    const where = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+    };
+
+    if (query.category) {
+      where.category = query.category;
+    }
+
+    if (query.isFeatured !== undefined) {
+      where.isFeatured = query.isFeatured === 'true' || query.isFeatured === true;
+    }
+
+    if (query.search) {
+      where.OR = [
+        { title: { contains: query.search, mode: 'insensitive' } },
+        { description: { contains: query.search, mode: 'insensitive' } },
+        { performers: { contains: query.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (query.city) {
+      where.venue = {
+        city: { contains: query.city, mode: 'insensitive' },
+      };
+    }
+
+    const [total, events] = await Promise.all([
+      prisma.event.count({ where }),
+      prisma.event.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { startDate: 'asc' },
+        include: {
+          venue: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              city: true,
+              state: true,
+              country: true,
+              capacity: true,
+              facilities: true,
+            },
+          },
+          organization: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          sessions: {
+            where: { status: 'SCHEDULED' },
+            orderBy: { startTime: 'asc' },
+            select: {
+              id: true,
+              title: true,
+              startTime: true,
+              endTime: true,
+            },
+          },
+          ticketTiers: {
+            where: { status: 'ACTIVE' },
+            orderBy: { price: 'asc' },
+            select: {
+              id: true,
+              name: true,
+              seatType: true,
+              price: true,
+              currency: true,
+              availableQuantity: true,
+              totalQuantity: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    // Format events with computed fields: startingPrice and availableTickets
+    const formattedEvents = events.map((event) => {
+      const prices = event.ticketTiers.map((t) => Number(t.price));
+      const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+      const currency = event.ticketTiers[0]?.currency || 'INR';
+      const availableTickets = event.ticketTiers.reduce(
+        (acc, t) => acc + (t.availableQuantity || 0),
+        0
+      );
+
+      return {
+        ...event,
+        startingPrice,
+        currency,
+        availableTickets,
+      };
+    });
+
+    return {
+      events: formattedEvents,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
+   * Get single published event by ID or Slug with full details
+   */
+  async getPublicEventBySlugOrId(identifier) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      identifier
+    );
+
+    const where = {
+      status: 'PUBLISHED',
+      deletedAt: null,
+      ...(isUuid ? { id: identifier } : { slug: identifier }),
+    };
+
+    const event = await prisma.event.findFirst({
+      where,
+      include: {
+        venue: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            city: true,
+            state: true,
+            country: true,
+            capacity: true,
+            facilities: true,
+            rules: true,
+            images: true,
+          },
+        },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        sessions: {
+          where: { status: 'SCHEDULED' },
+          orderBy: { startTime: 'asc' },
+        },
+        ticketTiers: {
+          where: { status: 'ACTIVE' },
+          orderBy: { price: 'asc' },
+        },
+      },
+    });
+
+    if (!event) {
+      throw AppError.notFound('Event not found or is no longer active');
+    }
+
+    const prices = event.ticketTiers.map((t) => Number(t.price));
+    const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+    const currency = event.ticketTiers[0]?.currency || 'INR';
+    const availableTickets = event.ticketTiers.reduce(
+      (acc, t) => acc + (t.availableQuantity || 0),
+      0
+    );
+
+    return {
+      ...event,
+      startingPrice,
+      currency,
+      availableTickets,
+    };
+  }
 }
 
 module.exports = new EventService();

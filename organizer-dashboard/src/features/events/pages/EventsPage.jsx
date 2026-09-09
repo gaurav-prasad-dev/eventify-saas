@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   PageHeader,
   ActionButton,
@@ -7,58 +7,83 @@ import {
   StatCard,
   FormField,
   FormInput,
+  useToast,
 } from '@eventify/ui';
-import { Plus, Calendar, DollarSign, Users, Download, Search } from 'lucide-react';
-
-const initialEvents = [
-  {
-    id: 'EVT-1001',
-    title: 'Global Tech Summit 2026',
-    venue: 'Grand Convention Hall, Hall A',
-    date: '15 Oct 2026, 10:00 AM',
-    ticketsSold: '450 / 500',
-    revenue: '₹4,50,000',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'EVT-1002',
-    title: 'Indie Rock Music Fest',
-    venue: 'Open Grounds Arena',
-    date: '28 Oct 2026, 06:00 PM',
-    ticketsSold: '1,200 / 2,000',
-    revenue: '₹9,60,000',
-    status: 'PUBLISHED',
-  },
-  {
-    id: 'EVT-1003',
-    title: 'Fintech Leadership Forum',
-    venue: 'Skyline Auditorium',
-    date: '05 Nov 2026, 09:30 AM',
-    ticketsSold: '0 / 250',
-    revenue: '₹0',
-    status: 'DRAFT',
-  },
-];
+import { eventsApi } from '../services/events.api';
+import { CreateEventModal } from '../components/CreateEventModal';
+import {
+  Plus,
+  Calendar,
+  DollarSign,
+  Users,
+  Search,
+  Sparkles,
+  MapPin,
+  Eye,
+  CheckCircle2,
+} from 'lucide-react';
 
 export const EventsPage = () => {
+  const { toast } = useToast();
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [events] = useState(initialEvents);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [publishingId, setPublishingId] = useState(null);
 
-  const filteredEvents = events.filter((e) =>
-    e.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const loadEvents = async () => {
+    setIsLoading(true);
+    try {
+      const data = await eventsApi.getEvents();
+      const list = Array.isArray(data) ? data : (data.events || data.data || []);
+      setEvents(list);
+    } catch (err) {
+      toast.error('Failed to load events');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  const handlePublish = async (eventId) => {
+    setPublishingId(eventId);
+    try {
+      await eventsApi.publishEvent(eventId);
+      toast.success('Event published live to Marketplace!');
+      loadEvents();
+    } catch (err) {
+      toast.error(err.message || 'Cannot publish event: At least 1 session and 1 ticket tier required.');
+    } finally {
+      setPublishingId(null);
+    }
+  };
+
+  const filteredEvents = events.filter(
+    (e) =>
+      e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (e.venue?.name && e.venue.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const totalEvents = events.length;
+  const publishedCount = events.filter((e) => e.status === 'PUBLISHED').length;
+  const totalCapacity = events.reduce((acc, e) => acc + (e.totalCapacity || 0), 0);
 
   return (
     <div className="space-y-6">
       {/* 1. Standard Page Header */}
       <PageHeader
         title="Events Management"
-        subtitle="Create, monitor, and configure ticket sales for your organization"
+        subtitle="Create, monitor, and publish ticketed events linked to your venues"
       >
-        <ActionButton variant="outline" icon={<Download />}>
-          Export CSV
-        </ActionButton>
-        <ActionButton variant="primary" icon={<Plus />}>
+        <ActionButton
+          variant="primary"
+          icon={<Plus />}
+          onClick={() => setIsCreateOpen(true)}
+        >
           Create Event
         </ActionButton>
       </PageHeader>
@@ -67,23 +92,22 @@ export const EventsPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Total Events"
-          value="12"
-          subtitle="3 currently active"
+          value={totalEvents.toString()}
+          subtitle={`${publishedCount} published live`}
           icon={<Calendar />}
         />
         <StatCard
-          title="Tickets Sold"
-          value="1,650"
-          change="+18.4%"
-          isPositive={true}
-          icon={<Users />}
+          title="Live on Marketplace"
+          value={publishedCount.toString()}
+          subtitle="Discoverable by customers"
+          isPositive={publishedCount > 0}
+          icon={<Sparkles />}
         />
         <StatCard
-          title="Total Revenue"
-          value="₹14,10,000"
-          change="+12.1%"
-          isPositive={true}
-          icon={<DollarSign />}
+          title="Total Event Capacity"
+          value={totalCapacity.toLocaleString()}
+          subtitle="Configured ticket capacity"
+          icon={<Users />}
         />
       </div>
 
@@ -92,7 +116,7 @@ export const EventsPage = () => {
         <div className="w-72">
           <FormField>
             <FormInput
-              placeholder="Search events by title..."
+              placeholder="Search by title, category, venue..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -101,51 +125,127 @@ export const EventsPage = () => {
       </div>
 
       {/* 4. Pre-styled LEGO Table */}
-      <TableShell
-        footer={
-          <span>
-            Showing <strong className="font-semibold text-slate-700 dark:text-zinc-200">{filteredEvents.length}</strong> of{' '}
-            <strong className="font-semibold text-slate-700 dark:text-zinc-200">{events.length}</strong> events
-          </span>
-        }
-      >
-        <table className="master-table">
-          <thead>
-            <tr>
-              <th className="w-24">Event ID</th>
-              <th>Title</th>
-              <th>Venue</th>
-              <th>Date</th>
-              <th>Tickets Sold</th>
-              <th>Revenue</th>
-              <th>Status</th>
-              <th className="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEvents.map((evt) => (
-              <tr key={evt.id}>
-                <td className="font-mono text-xs text-slate-400 dark:text-zinc-500">{evt.id}</td>
-                <td className="font-semibold text-slate-900 dark:text-white">{evt.title}</td>
-                <td className="text-slate-600 dark:text-zinc-300">{evt.venue}</td>
-                <td className="font-mono text-xs text-slate-500 dark:text-zinc-400">{evt.date}</td>
-                <td className="font-mono text-xs">{evt.ticketsSold}</td>
-                <td className="font-mono font-bold text-slate-900 dark:text-white price-display">
-                  {evt.revenue}
-                </td>
-                <td>
-                  <StatusBadge status={evt.status} />
-                </td>
-                <td className="text-right">
-                  <ActionButton size="sm" variant="ghost">
-                    Manage
-                  </ActionButton>
-                </td>
+      {isLoading ? (
+        <div className="py-20 flex justify-center">
+          <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : filteredEvents.length === 0 ? (
+        <div className="text-center py-16 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl card-side-shadow space-y-3">
+          <Calendar className="w-12 h-12 mx-auto text-slate-300 dark:text-zinc-600" />
+          <h4 className="text-base font-bold text-slate-800 dark:text-zinc-200">
+            No events found
+          </h4>
+          <p className="text-xs text-slate-400 dark:text-zinc-500 max-w-sm mx-auto">
+            Create your first event, link it to one of your venues, and publish it to the marketplace.
+          </p>
+          <ActionButton
+            variant="primary"
+            size="sm"
+            icon={<Plus />}
+            onClick={() => setIsCreateOpen(true)}
+          >
+            Create Your First Event
+          </ActionButton>
+        </div>
+      ) : (
+        <TableShell
+          footer={
+            <span>
+              Showing <strong className="font-semibold text-slate-700 dark:text-zinc-200">{filteredEvents.length}</strong> of{' '}
+              <strong className="font-semibold text-slate-700 dark:text-zinc-200">{events.length}</strong> events
+            </span>
+          }
+        >
+          <table className="master-table">
+            <thead>
+              <tr>
+                <th className="w-24">Event ID</th>
+                <th>Title & Category</th>
+                <th>Linked Venue</th>
+                <th>Dates</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th className="text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </TableShell>
+            </thead>
+            <tbody>
+              {filteredEvents.map((evt) => {
+                const startDateStr = new Date(evt.startDate).toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                });
+
+                return (
+                  <tr key={evt.id}>
+                    <td className="font-mono text-xs text-slate-400 dark:text-zinc-500">
+                      {evt.id.slice(0, 8)}...
+                    </td>
+                    <td>
+                      <div>
+                        <span className="font-semibold text-slate-900 dark:text-white block">
+                          {evt.title}
+                        </span>
+                        <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300">
+                          {evt.category}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      {evt.venue ? (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-zinc-300">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <span>
+                            {evt.venue.name} ({evt.venue.city})
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">No venue linked</span>
+                      )}
+                    </td>
+                    <td className="font-mono text-xs text-slate-500 dark:text-zinc-400">
+                      {startDateStr}
+                    </td>
+                    <td className="font-mono text-xs font-semibold">
+                      {evt.totalCapacity ? evt.totalCapacity.toLocaleString() : 'Open'}
+                    </td>
+                    <td>
+                      <StatusBadge status={evt.status} />
+                    </td>
+                    <td className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {evt.status === 'DRAFT' && (
+                          <ActionButton
+                            size="sm"
+                            variant="primary"
+                            icon={<Sparkles />}
+                            isLoading={publishingId === evt.id}
+                            onClick={() => handlePublish(evt.id)}
+                          >
+                            Publish
+                          </ActionButton>
+                        )}
+                        {evt.status === 'PUBLISHED' && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 pr-2">
+                            <CheckCircle2 className="w-4 h-4" /> Live
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </TableShell>
+      )}
+
+      {/* Create Event Modal */}
+      <CreateEventModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onCreated={() => loadEvents()}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiClient, setAccessToken } from '../../../shared/api/apiClient';
+import { apiClient, setAccessToken, setActiveOrgId } from '../../../shared/api/apiClient';
 import { useToast } from '@eventify/ui';
 
 const ORGANIZER_ALLOWED_ROLES = [
@@ -42,13 +42,20 @@ export const AuthProvider = ({ children }) => {
           if (checkUserRoles(u)) {
             setUser(u);
             const firstOrg = u.memberships?.[0]?.organization;
-            if (firstOrg) setActiveOrganization(firstOrg);
+            if (firstOrg) {
+              setActiveOrganization(firstOrg);
+              setActiveOrgId(firstOrg.id);
+            }
           } else {
             setUser(null);
+            setActiveOrganization(null);
+            setActiveOrgId(null);
           }
         }
       } catch (err) {
         setUser(null);
+        setActiveOrganization(null);
+        setActiveOrgId(null);
       } finally {
         setIsLoading(false);
       }
@@ -84,6 +91,8 @@ export const AuthProvider = ({ children }) => {
         await apiClient.post('/auth/logout', {}).catch(() => {});
         setAccessToken(null);
         setUser(null);
+        setActiveOrganization(null);
+        setActiveOrgId(null);
         toast.error('Access Denied: You do not have staff or organizer permissions for any organization.');
         throw new Error('Access Denied: Organizer permissions required.');
       }
@@ -94,7 +103,10 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
 
       const firstOrg = userData.memberships?.[0]?.organization;
-      if (firstOrg) setActiveOrganization(firstOrg);
+      if (firstOrg) {
+        setActiveOrganization(firstOrg);
+        setActiveOrgId(firstOrg.id);
+      }
 
       toast.success(`Welcome back, ${userData.name}!`);
       return userData;
@@ -106,22 +118,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const verifyStaffInvite = async ({ invitationToken, name, otp }) => {
+  const verifyStaffInvite = async (token, name) => {
     try {
-      const res = await apiClient.post('/auth/staff/verify-invite', {
-        invitationToken,
-        name: name.trim(),
-        otp: otp.trim(),
+      const res = await apiClient.post('/auth/staff/invite/accept', {
+        token,
+        name,
       });
 
-      const userData = res.data?.user;
       if (res.data?.accessToken) {
         setAccessToken(res.data.accessToken);
       }
+      const userData = res.data?.user;
       setUser(userData);
 
       const firstOrg = userData?.memberships?.[0]?.organization;
-      if (firstOrg) setActiveOrganization(firstOrg);
+      if (firstOrg) {
+        setActiveOrganization(firstOrg);
+        setActiveOrgId(firstOrg.id);
+      }
 
       toast.success('Staff invitation accepted! Welcome to the organization.');
       return userData;
@@ -139,6 +153,7 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(null);
       setUser(null);
       setActiveOrganization(null);
+      setActiveOrgId(null);
       toast.info('Logged out from Organizer ERP.');
     }
   };
